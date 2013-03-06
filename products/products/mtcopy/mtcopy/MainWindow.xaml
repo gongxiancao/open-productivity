@@ -1,0 +1,57 @@
+﻿<Window xmlns:my1="clr-namespace:GX.Architecture.Wpf.IO.Commands;assembly=GX.Architecture.Wpf" x:Class="mtcopy.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Name="myWindow" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <DoubleAnimation Name="expandAnimation" Storyboard.TargetName="myWindow" Storyboard.TargetProperty="Height" Duration="0:0:3" SpeedRatio="10" />
+    </Window.DataContext>
+    <DockPanel Name="panel" MinWidth="500">
+
+        <TextBlock Text="Copying files..." FontSize="15" Padding="20,20,0,20" DockPanel.Dock="Top">
+            <TextBlock.Background><LinearGradientBrush EndPoint="1,1" StartPoint="0,1"><GradientStop Color="#FF306FA3" Offset="0.946" /><GradientStop Color="#FFEFF3F8" Offset="0" /></LinearGradientBrush></TextBlock.Background></TextBlock>
+        <StackPanel Margin="20,10,20,0" DockPanel.Dock="Top">
+            <DockPanel >
+                <TextBlock Text="From:"/>
+                <TextBlock Name="sourceText" Text="" Margin="5, 0, 10, 0"/>
+            </DockPanel>
+            <DockPanel>
+                <TextBlock Text="To:"/>
+                <TextBlock Name="destinationText" Text="..." Margin="5, 0, 10, 0"/>
+            </DockPanel>
+            <DockPanel>
+                <TextBlock Text="Transered:"/>
+                <TextBlock Name="transferedText" Text="0KB" Margin="5, 0, 10, 0"/>
+            </DockPanel>
+            <DockPanel>
+                <TextBlock Text="Time elapsed:"/>
+                <TextBlock Name="timeText" Text="s" Margin="5, 0, 10, 0"/>
+            </DockPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Average Speed:" Grid.Column="0"/>
+                <TextBlock Name="averageSpeedText" Text="0KB/s" Margin="5, 0, 10, 0" Grid.Column="1"/>
+                
+                <TextBlock Text="Speed: " Grid.Column="2"/>
+                <TextBlock Name="speedText" Text="0KB/s" Margin="5, 0, 10, 0" Grid.Column="3"/>
+            </Grid>
+        </StackPanel>
+        <Grid DockPanel.Dock="Bottom" Background="#EEEEEEEE" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Expander Name="expandDetails" Grid.Column="0" Margin="20,15,20,15" Header="More details" Collapsed="expandDetails_Collapsed" Expanded="expandDetails_Expanded"/>
+            <Button Name="cancelButton" Grid.Column="2" Height="25" Margin="0,0,20,0" Padding="10,0,10,0" Click="cancelButton_Click">
+                <AccessText Text="_Cancel"/>
+            </Button>
+        </Grid>
+        <Grid Name="gridContainer" Margin="20,10,20,10"/>
+    </DockPanel>
+
+</Window>

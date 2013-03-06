@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C3A5DE03-B6E1-4B0B-8FE5-8C1B324BA950}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GX.Architecture</RootNamespace>
+    <AssemblyName>GX.Architecture</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\GuidAttribute.cs" />
+    <Compile Include="Configuration\CommandLine\AliasAttribute.cs" />
+    <Compile Include="Configuration\CommandLine\ApplicationEntryPointAttribute.cs" />
+    <Compile Include="Configuration\CommandLine\CommandBindingCall.cs" />
+    <Compile Include="Configuration\CommandLine\CommandLineParser.cs" />
+    <Compile Include="Configuration\CommandLine\ConfigurationInfo.cs" />
+    <Compile Include="Configuration\CommandLine\ConfigurationInfoGenerator.cs" />
+    <Compile Include="Configuration\CommandLine\DefaultValueAttribute.cs" />
+    <Compile Include="Configuration\CommandLine\NameAtttibute.cs" />
+    <Compile Include="Configuration\CommandLine\SwitchAttribute.cs" />
+    <Compile Include="Data\StringExt.cs" />
+    <Compile Include="Data\XmlNodeExt.cs" />
+    <Compile Include="IO\Commands\MultiThreadCopyCommandFailureMonitor.cs" />
+    <Compile Include="IO\Commands\CopyFileWorkItem.cs" />
+    <Compile Include="IO\Commands\CopyFileWorkItemProcessor.cs" />
+    <Compile Include="IO\Commands\MultiThreadCopyCommand.cs" />
+    <Compile Include="IO\Commands\MultiThreadCopyCommandProgressMonitor.cs" />
+    <Compile Include="IO\Utilities.cs" />
+    <Compile Include="Log\ConsoleLogWriter.cs" />
+    <Compile Include="Log\EventLog.cs" />
+    <Compile Include="Log\LogWriter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GX.Algorithm\GX.Algorithm.csproj">
+      <Project>{D70A0652-022D-41AF-B959-A4195BC9113C}</Project>
+      <Name>GX.Algorithm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GX.IO\GX.IO.csproj">
+      <Project>{BDB42DBB-4875-44AC-BFDA-64D5D3B797CB}</Project>
+      <Name>GX.IO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GX.Patterns.Implementations\GX.Patterns.Implementations.csproj">
+      <Project>{490CD3E6-FDF6-468A-8DD4-62A6E6451649}</Project>
+      <Name>GX.Patterns.Implementations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GX.Patterns\GX.Patterns.csproj">
+      <Project>{63766A38-EEB5-43AF-AF1A-547F8D434E9E}</Project>
+      <Name>GX.Patterns</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

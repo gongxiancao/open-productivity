@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="GX.Architecture.Wpf.IO.Commands.MultiThreadCopyCommandUI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" Loaded="UserControl_Loaded">
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LastChildFill="True" >
+        <DockPanel Margin="0,0,0,20" DockPanel.Dock="Top">
+            <Grid>
+                <ProgressBar Name="mainProgress" Height="16" Margin="0,0,0,0" Value="0"/>
+                <TextBlock Name="textStatus" Text="" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </DockPanel>
+
+        <ScrollViewer Name="details" VerticalScrollBarVisibility="Auto" Visibility="Collapsed" >
+            <StackPanel>
+                <StackPanel Name="progressPanel">
+                </StackPanel>
+                <ListView Name="failedList" Visibility="Hidden">
+                    <ListViewItem >
+                        
+                    </ListViewItem>
+                </ListView>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+
+</UserControl>
