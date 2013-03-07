@@ -113,17 +113,11 @@
       <Project>{63766A38-EEB5-43AF-AF1A-547F8D434E9E}</Project>
       <Name>GX.Patterns</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\framework\GX.Threading\GX.Threading.csproj">
-      <Project>{99B3B3D3-4F7F-4620-AC3E-20B56135B9E3}</Project>
-      <Name>GX.Threading</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>robocopy "$(TargetDir) "   "$(SolutionDir)..\..\drops\mtcopy\latest\$(ConfigurationName)" /MIR
-set rce=%25errorlevel%25 
-if not %25rce%25==1 exit %25rce%25 else exit 0
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
