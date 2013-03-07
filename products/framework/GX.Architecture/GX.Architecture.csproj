@@ -43,7 +43,7 @@
     <Compile Include="Attributes\GuidAttribute.cs" />
     <Compile Include="Configuration\CommandLine\AliasAttribute.cs" />
     <Compile Include="Configuration\CommandLine\ApplicationEntryPointAttribute.cs" />
-    <Compile Include="Configuration\CommandLine\CommandBindingCall.cs" />
+    <Compile Include="Configuration\CommandLine\CommandInvoker.cs" />
     <Compile Include="Configuration\CommandLine\CommandLineParser.cs" />
     <Compile Include="Configuration\CommandLine\ConfigurationInfo.cs" />
     <Compile Include="Configuration\CommandLine\ConfigurationInfoGenerator.cs" />

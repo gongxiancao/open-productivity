@@ -31,12 +31,7 @@ namespace mtcopy
         double ExpandedHeight = 0;
         double CollapsedHeight = 0;
 
-        public delegate void MainDel(
-            string application,
-            string source,
-            string destination,
-            string include);
-
+      [ApplicationEntryPoint]
         public void Main(
             [Name(null), Alias(null)]
             string application,
@@ -82,7 +77,7 @@ namespace mtcopy
 
             try
             {
-                CommandBindingCall.Invoke(new MainDel(Main), Environment.CommandLine);
+                CommandInvoker.Invoke(this, Environment.CommandLine);
             }
             catch (Exception ex)
             {

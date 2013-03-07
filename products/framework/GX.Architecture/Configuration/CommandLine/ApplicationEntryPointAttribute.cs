@@ -6,7 +6,7 @@ using System.Text;
 namespace GX.Architecture.Configuration.CommandLine
 {
     [AttributeUsage(AttributeTargets.Method)]
-    class ApplicationEntryPointAttribute : Attribute
+    public class ApplicationEntryPointAttribute : Attribute
     {
     }
 }
