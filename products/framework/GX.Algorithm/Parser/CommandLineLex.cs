@@ -51,19 +51,6 @@ namespace GX.Algorithm.Parser
                 }
                 return new Token(TokenType.ArgumentName, source.Substring(start, position - start));
             }
-            if (char.IsLetterOrDigit(ch))
-            {
-                int start = position;
-                while (++position < length)
-                {
-                    ch = source[position];
-                    if (char.IsSeparator(ch))
-                    {
-                        break;
-                    }
-                }
-                return new Token(TokenType.String, source.Substring(start, position - start));
-            }
             if (ch == '"')
             {
                 StringBuilder value = new StringBuilder(length);
@@ -103,6 +90,20 @@ namespace GX.Algorithm.Parser
                 ++position;
                 return new Token(TokenType.Colon, ":");
             }
+
+            {
+                int start = position;
+                while (++position < length)
+                {
+                    ch = source[position];
+                    if (char.IsSeparator(ch))
+                    {
+                        break;
+                    }
+                }
+                return new Token(TokenType.String, source.Substring(start, position - start));
+            }
+
             throw new ArgumentException(string.Format("Invalid source: {0}, position: {1}", source, position), "source");
         }
 

@@ -103,7 +103,7 @@ namespace GX.Architecture.Test
                 CommandLineParser target = new CommandLineParser(configuartionInfo);
 
 
-                TestParse(target, "/ test1 / test2", new object[] { "test1", "/123" });
+                //TestParse(target, "/ test1 / test2", new object[] { "test1", "/123" });
                 TestParse(target, "/source test1 /dest \"/123\"", new object[] { "test1", "/123" });
                 TestParse(target, "", new object[] { null, null });
                 TestParse(target, "/source source /dest dest", new object[] { "source", "dest" });
@@ -117,6 +117,7 @@ namespace GX.Architecture.Test
                 TestParse(target, "/dest dest source", new object[] { "source", "dest" });
                 TestParse(target, "/source:source /dest dest", new object[] { "source", "dest" });
                 TestParse(target, "/source : source /dest dest", new object[] { "source", "dest" });
+                TestParse(target, "\\\\rubicon\\test \"abc\"", new object[] { "\\\\rubicon\\test", "abc"});
             }
             {
                 ConfigurationInfo configuartionInfo = gen.Generate(this.GetType().GetMethod("TestEntryPoint", new Type[] { typeof(string), typeof(bool), typeof(string) }));
