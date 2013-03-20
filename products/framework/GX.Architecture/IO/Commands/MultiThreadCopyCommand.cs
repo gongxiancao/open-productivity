@@ -11,7 +11,7 @@ using GX.Patterns.Progress;
 
 namespace GX.Architecture.IO.Commands
 {
-    public class MultiThreadCopyCommand : ICommand, IStartCompletionMonitorable, IProgressMonitorable<MultiThreadCopyCommand>
+    public class MultiThreadCopyCommand : ICommand, IStartCompletionMonitorable, IProgressMonitorable<MultiThreadCopyCommand>, IErrorMonitorable
     {
         private ConfirmCopyCallback confirmCopy;
         private ConfirmCreateDirectoryCallback confirmCreateDirectory;
@@ -42,7 +42,7 @@ namespace GX.Architecture.IO.Commands
             processor.Start += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(processor_Start);
             processor.Complete += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(processor_Complete);
             processor.ProgressUpdate += new EventHandler<ProgressEventArgs<CopyFileWorkItem>>(processor_ProgressUpdate);
-
+            int workItemQueued = 0;
             for (int i = 0; i < Sources.Length; ++i )
             {
                 FileSystemInfo source = null;
@@ -64,11 +64,16 @@ namespace GX.Architecture.IO.Commands
                         ProgressWeight = 1.0,
                         FinishedSize = 0
                     }).Complete += new EventHandler(MultiThreadCopyCommand_Complete);
+                    workItemQueued++;
                 }
                 else
                 {
-                    throw new FileNotFoundException("Source file cannot be found", src);
+                    OnError(new GX.Patterns.ErrorEventArgs(new FileNotFoundException(string.Format("Source file {0} cannot be found.", src), src)));
                 }
+            }
+            if (workItemQueued <= 0)
+            {
+                OnComplete(new EventArgs());
             }
         }
 
@@ -132,6 +137,14 @@ namespace GX.Architecture.IO.Commands
             }
         }
 
+        protected virtual void OnError(GX.Patterns.ErrorEventArgs e)
+        {
+            if (Error != null)
+            {
+                Error(this, e);
+            }
+        }
+
         public event EventHandler<ProgressEventArgs<CopyFileWorkItem>> CopyFileProgressUpdate;
         public event EventHandler<WorkItemEventArgs<CopyFileWorkItem>> CopyFileStart;
         public event EventHandler<WorkItemEventArgs<CopyFileWorkItem>> CopyFileComplete;
@@ -140,5 +153,11 @@ namespace GX.Architecture.IO.Commands
         public event EventHandler Complete;
         public event EventHandler<ProgressEventArgs<MultiThreadCopyCommand>> ProgressUpdate;
 
+
+        #region IErrorMonitorable Members
+
+        public event EventHandler<Patterns.ErrorEventArgs> Error;
+
+        #endregion
     }
 }

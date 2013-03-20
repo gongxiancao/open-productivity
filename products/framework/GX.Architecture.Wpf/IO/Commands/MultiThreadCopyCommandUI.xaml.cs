@@ -203,6 +203,5 @@ namespace GX.Architecture.Wpf.IO.Commands
         {
             Command.Do();
         }
-
     }
 }

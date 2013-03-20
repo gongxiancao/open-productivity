@@ -31,7 +31,7 @@ namespace mtcopy
         double ExpandedHeight = 0;
         double CollapsedHeight = 0;
 
-      [ApplicationEntryPoint]
+        [ApplicationEntryPoint]
         public void Main(
             [Name(null), Alias(null)]
             string application,
@@ -65,10 +65,19 @@ namespace mtcopy
             }
             commandUI = new MultiThreadCopyCommandUI(sources.ToArray(), destinations.ToArray(), 10);
             commandUI.Command.Complete += new EventHandler(commandUI_Complete);
+            commandUI.Command.Error += new EventHandler<GX.Patterns.ErrorEventArgs>(Command_Error);
             monitor = new MultiThreadCopyCommandProgressMonitor(commandUI.Command);
             gridContainer.Children.Add(commandUI);
 
             DispatcherTimer timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.ApplicationIdle, TimerUpdate, this.Dispatcher);
+        }
+
+        void Command_Error(object sender, GX.Patterns.ErrorEventArgs e)
+        {
+            if (MessageBox.Show(e.Error.Message + "\nContinue?", "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.No)
+            {
+                this.Close();
+            }
         }
 
         public MainWindow()
@@ -102,7 +111,8 @@ namespace mtcopy
 
         void commandUI_Complete(object sender, EventArgs e)
         {
-            this.Dispatcher.BeginInvoke(new VoidFunc(Close), System.Windows.Threading.DispatcherPriority.Send);
+            this.Close();
+            //this.Dispatcher.BeginInvoke(new VoidFunc(Close), System.Windows.Threading.DispatcherPriority.Send);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

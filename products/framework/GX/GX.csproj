@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{63766A38-EEB5-43AF-AF1A-547F8D434E9E}</ProjectGuid>
+    <ProjectGuid>a8b59f0b-6aaa-4bca-b4e2-958c0cbf63ce</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GX.Patterns</RootNamespace>
-    <AssemblyName>GX.Patterns</AssemblyName>
+    <RootNamespace>GX</RootNamespace>
+    <AssemblyName>GX</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,31 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Concurrence\ReaderWriterLock.cs" />
-    <Compile Include="GenericDelegate.cs" />
-    <Compile Include="Misc\Recurser.cs" />
-    <Compile Include="Monitors\ErrorEventArgs.cs" />
-    <Compile Include="Monitors\ICompeletionMonitorable.cs" />
-    <Compile Include="Monitors\ICreationCompletionMonitorable.cs" />
-    <Compile Include="Concurrence\ConcurrenceSafeQueueProcessor.cs" />
-    <Compile Include="Func.cs" />
-    <Compile Include="ICommand.cs" />
-    <Compile Include="IProgress.cs" />
-    <Compile Include="Concurrence\IConcurrenceWorker.cs" />
-    <Compile Include="IQueueProcessor.cs" />
-    <Compile Include="ISettingsProvider.cs" />
-    <Compile Include="IWaitHandle.cs" />
-    <Compile Include="IWorkItem.cs" />
-    <Compile Include="Misc\Scoper.cs" />
-    <Compile Include="Monitors\IErrorMonitorable.cs" />
-    <Compile Include="Monitors\IProgressMonitorable.cs" />
-    <Compile Include="Monitors\IStartCompleteMonitorable.cs" />
-    <Compile Include="Monitors\IStartMonitorable.cs" />
-    <Compile Include="Monitors\ProgressEventArgs.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IWorkitemProcessor.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
