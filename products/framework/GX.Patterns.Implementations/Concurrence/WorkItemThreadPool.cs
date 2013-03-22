@@ -42,15 +42,15 @@ namespace GX.Patterns.Concurrence
         }
     }
 
-    public class MonitorableWorkItem<T> : ICreationCompletionMonitorable
+    public class MonitorableProcessor<T> : ICreationCompletionMonitorable
     {
         public IWorkItemProcessor<T> Processor { get; private set; }
         public event EventHandler<NewWorkItemEventArgs<T>> NewWorkItem;
 
-        public MonitorableWorkItem(IWorkItemProcessor<T> processor)
+        public MonitorableProcessor(IWorkItemProcessor<T> processor)
         {
             Processor = processor;
-            Processor.OnNewWorkItem += new EventHandler<NewWorkItemEventArgs<T>>(Processor_OnNewWorkItem);
+            Processor.NewWorkItem += new EventHandler<NewWorkItemEventArgs<T>>(Processor_OnNewWorkItem);
         }
 
         public void ProcessWorkItem(T workItem)
@@ -91,36 +91,32 @@ namespace GX.Patterns.Concurrence
     public class WorkItemProcessorThreadPool<T>
     {
         public IWorkItemProcessor<T> Processor { get; private set; }
+        private MonitorableProcessor<T> monitoredProcessor;
+        private CountBasedCompeletionMonitor completionMonitor;
 
         public WorkItemProcessorThreadPool(IWorkItemProcessor<T> processor)
         {
             Processor = processor;
+            monitoredProcessor = new MonitorableProcessor<T>(Processor);
+            completionMonitor = new CountBasedCompeletionMonitor(monitoredProcessor);
+            monitoredProcessor.NewWorkItem += new EventHandler<NewWorkItemEventArgs<T>>(tpWorkItem_NewWorkItem);
+        }
+
+        public void QueueUserWorkItem<T>(MonitorableProcessor<T> processor, T workItem)
+        {
+            ThreadPool.QueueUserWorkItem(processor.WaitCallback, workItem);
         }
 
         public ICompletionMonitorable QueueUserWorkitem(T workItem)
         {
-            MonitorableWorkItem<T> monitoredWorkItem = new MonitorableWorkItem<T>(Processor);
-            CountBasedCompeletionMonitor completionMonitor = new CountBasedCompeletionMonitor(monitoredWorkItem);
-
-            ThreadPool.QueueUserWorkItem(monitoredWorkItem.WaitCallback, workItem);
-            monitoredWorkItem.NewWorkItem += new EventHandler<NewWorkItemEventArgs<T>>(tpWorkItem_NewWorkItem);
-
+            ThreadPool.QueueUserWorkItem(monitoredProcessor.WaitCallback, workItem);
             return completionMonitor;
         }
 
         private void tpWorkItem_NewWorkItem(object sender, NewWorkItemEventArgs<T> e)
         {
-            MonitorableWorkItem<T> workItem = (MonitorableWorkItem<T>)sender;
+            MonitorableProcessor<T> workItem = (MonitorableProcessor<T>)sender;
             ThreadPool.QueueUserWorkItem(workItem.WaitCallback, e.WorkItem);
-        }
-    }
-
-    public class WorkItemProcessorThreadPool
-    {
-        public static ICompletionMonitorable QueueUserWorkItem<T>(IWorkItemProcessor<T> processor, T workItem)
-        {
-            WorkItemProcessorThreadPool<T> workItemProcessorThreadPool = new WorkItemProcessorThreadPool<T>(processor);
-            return workItemProcessorThreadPool.QueueUserWorkitem(workItem);
         }
     }
 

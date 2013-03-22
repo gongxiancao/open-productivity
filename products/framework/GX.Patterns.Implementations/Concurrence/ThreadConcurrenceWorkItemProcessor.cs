@@ -15,7 +15,7 @@ namespace GX.Patterns.Implementations.Concurrence
             : base(queue, newWorkItem, queryContinueCallback)
         {
             this.workitemProcessor = workitemProcessor;
-            this.workitemProcessor.OnNewWorkItem += new EventHandler<NewWorkItemEventArgs<T>>(workitemProcessor_OnNewWorkItem);
+            this.workitemProcessor.NewWorkItem += new EventHandler<NewWorkItemEventArgs<T>>(workitemProcessor_OnNewWorkItem);
         }
 
         void workitemProcessor_OnNewWorkItem(object sender, NewWorkItemEventArgs<T> e)

@@ -28,6 +28,7 @@ namespace GX.Architecture.IO.Commands
         public void ProcessWorkItem(CopyFileWorkItem workItem)
         {
             OnStart(new WorkItemEventArgs<CopyFileWorkItem>(workItem));
+
             try
             {
                 FileSystemInfo fsi = workItem.Item;
@@ -66,7 +67,7 @@ namespace GX.Architecture.IO.Commands
                         foreach (FileSystemInfo cfi in orderedChildren)
                         {
                             string destDirectoryName = Path.Combine(workItem.Destination, cfi.Name);
-                            OnNewWorkItem(this, new NewWorkItemEventArgs<CopyFileWorkItem>(workItem, new CopyFileWorkItem()
+                            OnNewWorkItem(new NewWorkItemEventArgs<CopyFileWorkItem>(workItem, new CopyFileWorkItem()
                             {
                                 Destination = destDirectoryName,
                                 Item = cfi,
@@ -86,7 +87,7 @@ namespace GX.Architecture.IO.Commands
 
         public event EventHandler<WorkItemEventArgs<CopyFileWorkItem>> Start;
         public event EventHandler<WorkItemEventArgs<CopyFileWorkItem>> Complete;
-        public event EventHandler<NewWorkItemEventArgs<CopyFileWorkItem>> OnNewWorkItem;
+        public event EventHandler<NewWorkItemEventArgs<CopyFileWorkItem>> NewWorkItem;
         public event EventHandler<ProgressEventArgs<CopyFileWorkItem>> ProgressUpdate;
 
         public bool IsValidWorkItem(CopyFileWorkItem workItem)
@@ -117,6 +118,14 @@ namespace GX.Architecture.IO.Commands
             if (Complete != null)
             {
                 Complete(this, e);
+            }
+        }
+
+        protected virtual void OnNewWorkItem(NewWorkItemEventArgs<CopyFileWorkItem> e)
+        {
+            if (NewWorkItem != null)
+            {
+                NewWorkItem(this, e);
             }
         }
     }

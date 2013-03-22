@@ -14,5 +14,10 @@ namespace GX.Architecture.IO.Commands
         public long FinishedSize { get; set; }
         public object Tag { get; set; }
         public object FailedReason { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{{Item:{0},Destination:{1}}}", Item.FullName, Destination);
+        }
     }
 }

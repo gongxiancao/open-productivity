@@ -31,7 +31,7 @@ namespace GX.Patterns
         void ProcessWorkItem(T workItem);
         bool IsValidWorkItem(T workItem);
         event EventHandler<WorkItemEventArgs<T>> Start;
-        event EventHandler<NewWorkItemEventArgs<T>> OnNewWorkItem;
+        event EventHandler<NewWorkItemEventArgs<T>> NewWorkItem;
         event EventHandler<WorkItemEventArgs<T>> Complete;
     }
 }

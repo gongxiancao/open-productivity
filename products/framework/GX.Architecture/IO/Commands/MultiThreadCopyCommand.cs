@@ -42,7 +42,9 @@ namespace GX.Architecture.IO.Commands
             processor.Start += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(processor_Start);
             processor.Complete += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(processor_Complete);
             processor.ProgressUpdate += new EventHandler<ProgressEventArgs<CopyFileWorkItem>>(processor_ProgressUpdate);
-            int workItemQueued = 0;
+            int validSources = 0;
+            WorkItemProcessorThreadPool<CopyFileWorkItem> processorThreadPool = new WorkItemProcessorThreadPool<CopyFileWorkItem>(processor);
+            List<FileSystemInfo> sources = new List<FileSystemInfo>();
             for (int i = 0; i < Sources.Length; ++i )
             {
                 FileSystemInfo source = null;
@@ -50,37 +52,45 @@ namespace GX.Architecture.IO.Commands
                 if (File.Exists(src))
                 {
                     source = new FileInfo(src);
+                    ++validSources;
                 }
                 else if (Directory.Exists(src))
                 {
                     source = new DirectoryInfo(src);
+                    ++validSources;
                 }
-                if (source != null)
-                {
-                    WorkItemProcessorThreadPool.QueueUserWorkItem(processor, new CopyFileWorkItem()
-                    {
-                        Destination = Destinations[i< Destinations.Length? i : (Destinations.Length - 1)],
-                        Item = source,
-                        ProgressWeight = 1.0,
-                        FinishedSize = 0
-                    }).Complete += new EventHandler(MultiThreadCopyCommand_Complete);
-                    workItemQueued++;
-                }
-                else
+                sources.Add(source);
+                if(source == null)
                 {
                     OnError(new GX.Patterns.ErrorEventArgs(new FileNotFoundException(string.Format("Source file {0} cannot be found.", src), src)));
                 }
             }
-            if (workItemQueued <= 0)
+
+            for(int i = 0; i < sources.Count; ++i)
+            {
+                FileSystemInfo source = sources[i];
+                if (source != null)
+                {
+                    double weight = 1.0 / validSources;
+                    processorThreadPool.QueueUserWorkitem(new CopyFileWorkItem()
+                    {
+                        Destination = Destinations[i < Destinations.Length ? i : (Destinations.Length - 1)],
+                        Item = source,
+                        ProgressWeight = 1.0,
+                        FinishedSize = 0
+                    });
+                }
+            }
+            if (validSources <= 0)
             {
                 OnComplete(new EventArgs());
             }
         }
 
-        void MultiThreadCopyCommand_Complete(object sender, EventArgs e)
-        {
-            OnComplete(e);
-        }
+        //void MultiThreadCopyCommand_Complete(object sender, EventArgs e)
+        //{
+        //    OnComplete(e);
+        //}
 
         protected virtual void OnCopyFileProgressUpdate(ProgressEventArgs<CopyFileWorkItem> e)
         {
