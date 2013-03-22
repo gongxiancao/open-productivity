@@ -111,8 +111,8 @@ namespace mtcopy
 
         void commandUI_Complete(object sender, EventArgs e)
         {
-            this.Close();
-            //this.Dispatcher.BeginInvoke(new VoidFunc(Close), System.Windows.Threading.DispatcherPriority.Send);
+            //this.Close();
+            this.Dispatcher.BeginInvoke(new VoidFunc(Close), System.Windows.Threading.DispatcherPriority.Send);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

@@ -43,7 +43,7 @@ namespace GX.Architecture.IO.Commands
             processor.Complete += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(processor_Complete);
             processor.ProgressUpdate += new EventHandler<ProgressEventArgs<CopyFileWorkItem>>(processor_ProgressUpdate);
             int validSources = 0;
-            WorkItemProcessorThreadPool<CopyFileWorkItem> processorThreadPool = new WorkItemProcessorThreadPool<CopyFileWorkItem>(processor);
+            WorkItemPool<CopyFileWorkItem> processorThreadPool = new WorkItemPool<CopyFileWorkItem>(processor);
             List<FileSystemInfo> sources = new List<FileSystemInfo>();
             for (int i = 0; i < Sources.Length; ++i )
             {
@@ -76,9 +76,9 @@ namespace GX.Architecture.IO.Commands
                     {
                         Destination = Destinations[i < Destinations.Length ? i : (Destinations.Length - 1)],
                         Item = source,
-                        ProgressWeight = 1.0,
+                        ProgressWeight = weight,
                         FinishedSize = 0
-                    });
+                    }).Complete += new EventHandler(MultiThreadCopyCommand_Complete);
                 }
             }
             if (validSources <= 0)
@@ -87,10 +87,10 @@ namespace GX.Architecture.IO.Commands
             }
         }
 
-        //void MultiThreadCopyCommand_Complete(object sender, EventArgs e)
-        //{
-        //    OnComplete(e);
-        //}
+        void MultiThreadCopyCommand_Complete(object sender, EventArgs e)
+        {
+            OnComplete(e);
+        }
 
         protected virtual void OnCopyFileProgressUpdate(ProgressEventArgs<CopyFileWorkItem> e)
         {
