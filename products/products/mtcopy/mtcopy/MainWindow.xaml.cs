@@ -40,7 +40,13 @@ namespace mtcopy
             [Alias("dest")]
             string destination,
             [Alias("inc")]
-            string include)
+            string include,
+            [Alias("exc")]
+            string exclude,
+            [Alias("reginc")]
+            string regexInclude,
+            [Alias("regexc")]
+            string regexExclude)
         {
             this.Title = string.Format("Copy from {0} to {1}", source, destination);
             this.sourceText.Text = source;
@@ -51,7 +57,7 @@ namespace mtcopy
             List<string> destinations = new List<string>();
             if (!string.IsNullOrEmpty(include))
             {
-                foreach (string inc in include.Split(','))
+                foreach (string inc in include.Split(new char[]{','}, StringSplitOptions.RemoveEmptyEntries))
                 {
                     sources.Add(System.IO.Path.Combine(source, inc));
                     destinations.Add(System.IO.Path.Combine(destination, inc));
@@ -63,7 +69,17 @@ namespace mtcopy
                 sources.Add(source);
                 destinations.Add(destination);
             }
-            commandUI = new MultiThreadCopyCommandUI(sources.ToArray(), destinations.ToArray(), 10);
+
+            List<string> excludes = new List<string>();
+            if(!string.IsNullOrEmpty(exclude))
+            {
+                foreach(string exc in exclude.Split(new char[]{','}, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    excludes.Add(System.IO.Path.Combine(source, exc));
+                }
+            }
+
+            commandUI = new MultiThreadCopyCommandUI(sources.ToArray(), destinations.ToArray(), excludes.ToArray(), regexInclude, regexExclude, 10);
             commandUI.Command.Complete += new EventHandler(commandUI_Complete);
             commandUI.Command.Error += new EventHandler<GX.Patterns.ErrorEventArgs>(Command_Error);
             monitor = new MultiThreadCopyCommandProgressMonitor(commandUI.Command);

@@ -40,7 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Concurrence\ThreadConcurrenceWorkItemProcessor.cs" />
     <Compile Include="Concurrence\ThreadSafeQueueProcessor.cs" />
     <Compile Include="Concurrence\WorkItemThreadPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

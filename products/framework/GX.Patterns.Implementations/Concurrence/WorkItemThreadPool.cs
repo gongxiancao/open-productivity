@@ -100,7 +100,7 @@ namespace GX.Patterns.Concurrence
             monitoredProcessor = new MonitorableProcessor<T>(Processor);
             completionMonitor = new CountBasedCompeletionMonitor(this);
             processor.NewWorkItem += new EventHandler<NewWorkItemEventArgs<T>>(processor_NewWorkItem);
-            processor.Complete += new EventHandler<WorkItemEventArgs<T>>(processor_Complete);
+            processor.Complete += new EventHandler<WorkItemResultEventArgs<T>>(processor_Complete);
             monitoredProcessor.NewWorkItem += new EventHandler<NewWorkItemEventArgs<T>>(tpWorkItem_NewWorkItem);
         }
 

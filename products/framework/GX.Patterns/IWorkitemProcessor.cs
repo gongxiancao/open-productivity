@@ -15,6 +15,32 @@ namespace GX.Patterns
         }
     }
 
+    public enum WorkItemResult
+    {
+        Completed,
+        Cancelled,
+        Failed
+    }
+
+    public class WorkItemResultEventArgs<T> : WorkItemEventArgs<T>
+    {
+        public WorkItemResult Result { get; private set; }
+        public WorkItemResultEventArgs(T workItem, WorkItemResult result)
+            : base(workItem)
+        {
+            this.Result = result;
+        }
+    }
+
+    public class CancelWorkItemEventArgs<T> : WorkItemEventArgs<T>
+    {
+        public bool Cancel { get; set; }
+        public CancelWorkItemEventArgs(T workItem)
+            : base(workItem)
+        {
+        }
+    }
+
     public class NewWorkItemEventArgs<T> : EventArgs
     {
         public T Parent { get; private set; }
@@ -30,8 +56,8 @@ namespace GX.Patterns
     {
         void ProcessWorkItem(T workItem);
         bool IsValidWorkItem(T workItem);
-        event EventHandler<WorkItemEventArgs<T>> Start;
+        event EventHandler<CancelWorkItemEventArgs<T>> Start;
         event EventHandler<NewWorkItemEventArgs<T>> NewWorkItem;
-        event EventHandler<WorkItemEventArgs<T>> Complete;
+        event EventHandler<WorkItemResultEventArgs<T>> Complete;
     }
 }

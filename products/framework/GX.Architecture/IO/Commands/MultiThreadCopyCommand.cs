@@ -8,6 +8,7 @@ using GX.IO;
 using GX.Patterns.Concurrence;
 using GX.Patterns;
 using GX.Patterns.Progress;
+using System.Text.RegularExpressions;
 
 namespace GX.Architecture.IO.Commands
 {
@@ -19,13 +20,37 @@ namespace GX.Architecture.IO.Commands
         private NotifyCreateDirectoryCallback notifyCreateDirectory;
         public string[] Sources { get; private set; }
         public string[] Destinations { get; private set; }
+        public string[] Excludes { get; private set; }
+        public string IncludePattern { get; private set; }
+        public string ExcludePattern { get; private set; }
+
+        private Regex includePattern = null;
+        private Regex excludePattern = null;
+
+        private HashSet<string> excludes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
         public int RetryCount { get; private set; }
         ManualResetEvent completeEvent = new ManualResetEvent(false);
-        public MultiThreadCopyCommand(string[] sources, string[] destinations, int retryCount,  ConfirmCopyCallback confirmCopy, ConfirmCreateDirectoryCallback confirmCreateDirectory, NotifyCopyCallback notifyCopy, NotifyCreateDirectoryCallback notifyCreateDirectory)
+
+        public MultiThreadCopyCommand(string[] sources, string[] destinations, string[] excludes, string includePattern,string excludePattern, int retryCount,  ConfirmCopyCallback confirmCopy, ConfirmCreateDirectoryCallback confirmCreateDirectory, NotifyCopyCallback notifyCopy, NotifyCreateDirectoryCallback notifyCreateDirectory)
         {
             this.RetryCount = retryCount;
             this.Sources = sources;
             this.Destinations = destinations;
+            this.IncludePattern = includePattern;
+            this.ExcludePattern = excludePattern;
+            this.Excludes = excludes;
+
+            this.excludes.UnionWith(excludes);
+            if (!string.IsNullOrEmpty(includePattern))
+            {
+                this.includePattern = new Regex(includePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            }
+            if (!string.IsNullOrEmpty(excludePattern))
+            {
+                this.excludePattern = new Regex(excludePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            }
+
             this.confirmCopy = confirmCopy;
             this.confirmCreateDirectory = confirmCreateDirectory;
             this.notifyCopy = notifyCopy;
@@ -39,8 +64,8 @@ namespace GX.Architecture.IO.Commands
             OnStart(new EventArgs());
             CopyFileWorkItemProcessor processor = new CopyFileWorkItemProcessor(RetryCount, confirmCopy, confirmCreateDirectory, notifyCopy, notifyCreateDirectory);
 
-            processor.Start += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(processor_Start);
-            processor.Complete += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(processor_Complete);
+            processor.Start += new EventHandler<CancelWorkItemEventArgs<CopyFileWorkItem>>(processor_Start);
+            processor.Complete += new EventHandler<WorkItemResultEventArgs<CopyFileWorkItem>>(processor_Complete);
             processor.ProgressUpdate += new EventHandler<ProgressEventArgs<CopyFileWorkItem>>(processor_ProgressUpdate);
             int validSources = 0;
             WorkItemPool<CopyFileWorkItem> processorThreadPool = new WorkItemPool<CopyFileWorkItem>(processor);
@@ -124,9 +149,23 @@ namespace GX.Architecture.IO.Commands
                 CopyFileStart(this, e);
             }
         }
-        void processor_Start(object sender, WorkItemEventArgs<CopyFileWorkItem> e)
+
+        void processor_Start(object sender, CancelWorkItemEventArgs<CopyFileWorkItem> e)
         {
+            if (!e.Cancel)
+            {
+                e.Cancel = !ShouldCopy(e.WorkItem);
+            }
+
             OnCopyFileStart(e);
+        }
+
+        private bool ShouldCopy(CopyFileWorkItem item)
+        {
+            string fullName = item.Item.FullName;
+            return (this.includePattern == null || this.includePattern.Match(fullName).Success)
+                && (this.excludePattern == null || !this.excludePattern.Match(fullName).Success)
+                && !this.excludes.Contains(fullName);
         }
 
         #endregion

@@ -62,13 +62,13 @@ namespace GX.Architecture.Wpf.IO.Commands
         }
         private string lastCopiedFile = null;
 
-        public MultiThreadCopyCommandUI(string[] sources, string[] destinations, int retryCount)
+        public MultiThreadCopyCommandUI(string[] sources, string[] destinations, string[] excludes, string includePattern, string excludePattern, int retryCount)
         {
-            Command = new MultiThreadCopyCommand(sources, destinations, retryCount, null, null, null, null);
+            Command = new MultiThreadCopyCommand(sources, destinations, excludes, includePattern, excludePattern, retryCount, null, null, null, null);
             InitializeComponent();
-            Command.CopyFileStart += new EventHandler<Patterns.WorkItemEventArgs<Architecture.IO.Commands.CopyFileWorkItem>>(Command_CopyFileStart);
-            Command.CopyFileProgressUpdate += new EventHandler<Patterns.Progress.ProgressEventArgs<Architecture.IO.Commands.CopyFileWorkItem>>(Command_CopyFileProgressUpdate);
-            Command.CopyFileComplete += new EventHandler<Patterns.WorkItemEventArgs<Architecture.IO.Commands.CopyFileWorkItem>>(Command_CopyFileComplete);
+            Command.CopyFileStart += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(Command_CopyFileStart);
+            Command.CopyFileProgressUpdate += new EventHandler<ProgressEventArgs<CopyFileWorkItem>>(Command_CopyFileProgressUpdate);
+            Command.CopyFileComplete += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(Command_CopyFileComplete);
             Command.Start += new EventHandler(Command_Start);
             Command.Complete += new EventHandler(Command_Complete);
         }

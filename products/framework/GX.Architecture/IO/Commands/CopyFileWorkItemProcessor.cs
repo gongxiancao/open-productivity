@@ -27,66 +27,73 @@ namespace GX.Architecture.IO.Commands
 
         public void ProcessWorkItem(CopyFileWorkItem workItem)
         {
-            OnStart(new WorkItemEventArgs<CopyFileWorkItem>(workItem));
-
-            try
+            WorkItemResult result = WorkItemResult.Completed;
+            if (!OnStart(new CancelWorkItemEventArgs<CopyFileWorkItem>(workItem)))
             {
-                FileSystemInfo fsi = workItem.Item;
-                if (fsi is FileInfo)
+                result = WorkItemResult.Cancelled;
+            }
+            else
+            {
+                try
                 {
-                    int cancel = 0;
-                    GX.IO.Utilities.CopyFile(fsi as FileInfo, workItem.Destination, retryCount, ref cancel, workItem, CopyFileProgressUpdate, confirmCopy, notifyCopy);
-                }
-                else if (fsi is DirectoryInfo)
-                {
-                    DirectoryInfo di = fsi as DirectoryInfo;
-
-                    bool destDirectoryExists = Directory.Exists(workItem.Destination);
-                    if (!destDirectoryExists)
+                    FileSystemInfo fsi = workItem.Item;
+                    if (fsi is FileInfo)
                     {
-                        destDirectoryExists = GX.IO.Utilities.CreateDirectory(workItem.Destination, confirmCreateDirectory, notifyCreateDirectory);
+                        int cancel = 0;
+                        GX.IO.Utilities.CopyFile(fsi as FileInfo, workItem.Destination, retryCount, ref cancel, workItem, CopyFileProgressUpdate, confirmCopy, notifyCopy);
                     }
-                    if (destDirectoryExists)
+                    else if (fsi is DirectoryInfo)
                     {
-                        FileSystemInfo[] children = di.GetFileSystemInfos();
-                        List<FileSystemInfo> orderedChildren = new List<FileSystemInfo>();
+                        DirectoryInfo di = fsi as DirectoryInfo;
 
-                        foreach (FileSystemInfo cfsi in children)
+                        bool destDirectoryExists = Directory.Exists(workItem.Destination);
+                        if (!destDirectoryExists)
                         {
-                            if (cfsi is FileInfo)
-                                orderedChildren.Add(cfsi);
+                            destDirectoryExists = GX.IO.Utilities.CreateDirectory(workItem.Destination, confirmCreateDirectory, notifyCreateDirectory);
                         }
-
-                        foreach (FileSystemInfo cfsi in children)
+                        if (destDirectoryExists)
                         {
-                            if (cfsi is DirectoryInfo)
-                                orderedChildren.Add(cfsi);
-                        }
+                            FileSystemInfo[] children = di.GetFileSystemInfos();
+                            List<FileSystemInfo> orderedChildren = new List<FileSystemInfo>();
 
-                        workItem.ProgressWeight = workItem.ProgressWeight / (orderedChildren.Count + 1);
-                        foreach (FileSystemInfo cfi in orderedChildren)
-                        {
-                            string destDirectoryName = Path.Combine(workItem.Destination, cfi.Name);
-                            OnNewWorkItem(new NewWorkItemEventArgs<CopyFileWorkItem>(workItem, new CopyFileWorkItem()
+                            foreach (FileSystemInfo cfsi in children)
                             {
-                                Destination = destDirectoryName,
-                                Item = cfi,
-                                ProgressWeight = workItem.ProgressWeight,
-                                FinishedSize = 0
-                            }));
+                                if (cfsi is FileInfo)
+                                    orderedChildren.Add(cfsi);
+                            }
+
+                            foreach (FileSystemInfo cfsi in children)
+                            {
+                                if (cfsi is DirectoryInfo)
+                                    orderedChildren.Add(cfsi);
+                            }
+
+                            workItem.ProgressWeight = workItem.ProgressWeight / (orderedChildren.Count + 1);
+                            foreach (FileSystemInfo cfi in orderedChildren)
+                            {
+                                string destDirectoryName = Path.Combine(workItem.Destination, cfi.Name);
+                                OnNewWorkItem(new NewWorkItemEventArgs<CopyFileWorkItem>(workItem, new CopyFileWorkItem()
+                                {
+                                    Destination = destDirectoryName,
+                                    Item = cfi,
+                                    ProgressWeight = workItem.ProgressWeight,
+                                    FinishedSize = 0
+                                }));
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    workItem.FailedReason = ex;
+                    result = WorkItemResult.Failed;
+                }
             }
-            catch (Exception ex)
-            {
-                workItem.FailedReason = ex;
-            }
-            OnComplete(new WorkItemEventArgs<CopyFileWorkItem>(workItem));
+            OnComplete(new WorkItemResultEventArgs<CopyFileWorkItem>(workItem, result));
         }
 
-        public event EventHandler<WorkItemEventArgs<CopyFileWorkItem>> Start;
-        public event EventHandler<WorkItemEventArgs<CopyFileWorkItem>> Complete;
+        public event EventHandler<CancelWorkItemEventArgs<CopyFileWorkItem>> Start;
+        public event EventHandler<WorkItemResultEventArgs<CopyFileWorkItem>> Complete;
         public event EventHandler<NewWorkItemEventArgs<CopyFileWorkItem>> NewWorkItem;
         public event EventHandler<ProgressEventArgs<CopyFileWorkItem>> ProgressUpdate;
 
@@ -105,15 +112,16 @@ namespace GX.Architecture.IO.Commands
             return CopyProgressResult.PROGRESS_CONTINUE;
         }
 
-        protected virtual void OnStart(WorkItemEventArgs<CopyFileWorkItem> e)
+        protected virtual bool OnStart(CancelWorkItemEventArgs<CopyFileWorkItem> e)
         {
             if (Start != null)
             {
                 Start(this, e);
             }
+            return !e.Cancel;
         }
 
-        protected virtual void OnComplete(WorkItemEventArgs<CopyFileWorkItem> e)
+        protected virtual void OnComplete(WorkItemResultEventArgs<CopyFileWorkItem> e)
         {
             if (Complete != null)
             {
