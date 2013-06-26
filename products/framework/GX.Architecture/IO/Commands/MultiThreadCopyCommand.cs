@@ -14,55 +14,45 @@ namespace GX.Architecture.IO.Commands
 {
     public class MultiThreadCopyCommand : ICommand, IStartCompletionMonitorable, IProgressMonitorable<MultiThreadCopyCommand>, IErrorMonitorable
     {
-        private ConfirmCopyCallback confirmCopy;
-        private ConfirmCreateDirectoryCallback confirmCreateDirectory;
-        private NotifyCopyCallback notifyCopy;
-        private NotifyCreateDirectoryCallback notifyCreateDirectory;
-        public string[] Sources { get; private set; }
-        public string[] Destinations { get; private set; }
-        public string[] Excludes { get; private set; }
-        public string IncludePattern { get; private set; }
-        public string ExcludePattern { get; private set; }
+        public ConfirmCopyCallback ConfirmCopy { get; set; }
+        public ConfirmCreateDirectoryCallback ConfirmCreateDirectory { get; set; }
+        public NotifyCopyCallback NotifyCopy { get; set; }
+        public NotifyCreateDirectoryCallback NotifyCreateDirectory { get; set; }
+        public string[] Sources { get; set; }
+        public string[] Destinations { get; set; }
+        public string[] Excludes { get; set; }
+        public string IncludePattern { get; set; }
+        public string ExcludePattern { get; set; }
 
         private Regex includePattern = null;
         private Regex excludePattern = null;
 
         private HashSet<string> excludes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        public int RetryCount { get; private set; }
+        public int RetryCount { get; set; }
         ManualResetEvent completeEvent = new ManualResetEvent(false);
 
-        public MultiThreadCopyCommand(string[] sources, string[] destinations, string[] excludes, string includePattern,string excludePattern, int retryCount,  ConfirmCopyCallback confirmCopy, ConfirmCreateDirectoryCallback confirmCreateDirectory, NotifyCopyCallback notifyCopy, NotifyCreateDirectoryCallback notifyCreateDirectory)
+        public MultiThreadCopyCommand()
         {
-            this.RetryCount = retryCount;
-            this.Sources = sources;
-            this.Destinations = destinations;
-            this.IncludePattern = includePattern;
-            this.ExcludePattern = excludePattern;
-            this.Excludes = excludes;
-
-            this.excludes.UnionWith(excludes);
-            if (!string.IsNullOrEmpty(includePattern))
-            {
-                this.includePattern = new Regex(includePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            }
-            if (!string.IsNullOrEmpty(excludePattern))
-            {
-                this.excludePattern = new Regex(excludePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            }
-
-            this.confirmCopy = confirmCopy;
-            this.confirmCreateDirectory = confirmCreateDirectory;
-            this.notifyCopy = notifyCopy;
-            this.notifyCreateDirectory = notifyCreateDirectory;
         }
 
         #region IAsyncCommand Members
 
         public void Do()
         {
+            this.excludes.UnionWith(Excludes);
+            if (!string.IsNullOrEmpty(IncludePattern))
+            {
+                this.includePattern = new Regex(IncludePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            }
+            if (!string.IsNullOrEmpty(ExcludePattern))
+            {
+                this.excludePattern = new Regex(ExcludePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            }
+
+
             OnStart(new EventArgs());
-            CopyFileWorkItemProcessor processor = new CopyFileWorkItemProcessor(RetryCount, confirmCopy, confirmCreateDirectory, notifyCopy, notifyCreateDirectory);
+            CopyFileWorkItemProcessor processor = new CopyFileWorkItemProcessor(RetryCount, ConfirmCopy, ConfirmCreateDirectory, NotifyCopy, NotifyCreateDirectory);
 
             processor.Start += new EventHandler<CancelWorkItemEventArgs<CopyFileWorkItem>>(processor_Start);
             processor.Complete += new EventHandler<WorkItemResultEventArgs<CopyFileWorkItem>>(processor_Complete);

@@ -64,7 +64,15 @@ namespace GX.Architecture.Wpf.IO.Commands
 
         public MultiThreadCopyCommandUI(string[] sources, string[] destinations, string[] excludes, string includePattern, string excludePattern, int retryCount)
         {
-            Command = new MultiThreadCopyCommand(sources, destinations, excludes, includePattern, excludePattern, retryCount, null, null, null, null);
+            Command = new MultiThreadCopyCommand()
+            {
+                 Sources = sources,
+                 Destinations = destinations,
+                 Excludes = excludes,
+                 IncludePattern = includePattern,
+                 ExcludePattern = excludePattern,
+                 RetryCount = retryCount
+            };
             InitializeComponent();
             Command.CopyFileStart += new EventHandler<WorkItemEventArgs<CopyFileWorkItem>>(Command_CopyFileStart);
             Command.CopyFileProgressUpdate += new EventHandler<ProgressEventArgs<CopyFileWorkItem>>(Command_CopyFileProgressUpdate);
