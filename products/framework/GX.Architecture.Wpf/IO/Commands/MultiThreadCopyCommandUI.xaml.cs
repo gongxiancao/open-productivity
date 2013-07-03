@@ -83,12 +83,12 @@ namespace GX.Architecture.Wpf.IO.Commands
 
         void Command_Complete(object sender, EventArgs e)
         {
-            this.Dispatcher.BeginInvoke(new VoidFunc(MainProgressComplete), DispatcherPriority.Send);
+            this.Dispatcher.BeginInvoke(new Action(MainProgressComplete), DispatcherPriority.Send);
         }
 
         void Command_Start(object sender, EventArgs e)
         {
-            this.Dispatcher.BeginInvoke(new VoidFunc(MainProgressStart));
+            this.Dispatcher.BeginInvoke(new Action(MainProgressStart));
         }
 
         void UpdateStatus(string text)
@@ -185,17 +185,17 @@ namespace GX.Architecture.Wpf.IO.Commands
 
         void Command_CopyFileStart(object sender, WorkItemEventArgs<CopyFileWorkItem> e)
         {
-            this.Dispatcher.BeginInvoke(new VoidFunc<WorkItemEventArgs<CopyFileWorkItem>>(Command_CopyFileStart), DispatcherPriority.ApplicationIdle, e);
+            this.Dispatcher.BeginInvoke(new Action<WorkItemEventArgs<CopyFileWorkItem>>(Command_CopyFileStart), DispatcherPriority.ApplicationIdle, e);
         }
 
         void Command_CopyFileComplete(object sender, WorkItemEventArgs<CopyFileWorkItem> e)
         {
-            this.Dispatcher.BeginInvoke(new VoidFunc<WorkItemEventArgs<CopyFileWorkItem>>(Command_CopyFileComplete), DispatcherPriority.ApplicationIdle, e);
+            this.Dispatcher.BeginInvoke(new Action<WorkItemEventArgs<CopyFileWorkItem>>(Command_CopyFileComplete), DispatcherPriority.ApplicationIdle, e);
         }
 
         void Command_CopyFileProgressUpdate(object sender, ProgressEventArgs<CopyFileWorkItem> e)
         {
-            this.Dispatcher.BeginInvoke(new VoidFunc<ProgressEventArgs<CopyFileWorkItem>>(Command_CopyFileProgressUpdate), DispatcherPriority.ApplicationIdle, e);
+            this.Dispatcher.BeginInvoke(new Action<ProgressEventArgs<CopyFileWorkItem>>(Command_CopyFileProgressUpdate), DispatcherPriority.ApplicationIdle, e);
         }
 
         private Grid FindProgressBar(CopyFileWorkItem workItem)

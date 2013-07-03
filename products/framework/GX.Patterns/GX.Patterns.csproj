@@ -47,7 +47,6 @@
     <Compile Include="Monitors\ICompeletionMonitorable.cs" />
     <Compile Include="Monitors\ICreationCompletionMonitorable.cs" />
     <Compile Include="Concurrence\ConcurrenceSafeQueueProcessor.cs" />
-    <Compile Include="Func.cs" />
     <Compile Include="ICommand.cs" />
     <Compile Include="IProgress.cs" />
     <Compile Include="Concurrence\IConcurrenceWorker.cs" />

@@ -40,6 +40,9 @@ namespace GX.Architecture.IO.Commands
 
         public void Do()
         {
+            OnStart(new EventArgs());
+
+            this.excludes.Clear();
             this.excludes.UnionWith(Excludes);
             if (!string.IsNullOrEmpty(IncludePattern))
             {
@@ -51,7 +54,7 @@ namespace GX.Architecture.IO.Commands
             }
 
 
-            OnStart(new EventArgs());
+
             CopyFileWorkItemProcessor processor = new CopyFileWorkItemProcessor(RetryCount, ConfirmCopy, ConfirmCreateDirectory, NotifyCopy, NotifyCreateDirectory);
 
             processor.Start += new EventHandler<CancelWorkItemEventArgs<CopyFileWorkItem>>(processor_Start);
