@@ -29,19 +29,85 @@ namespace GX.Architecture.IO.Commands
 
         private HashSet<string> excludes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        public int RetryCount { get; set; }
+        public int RetryCount
+        {
+            get { return processor.RetryCount; }
+            set { processor.RetryCount = value; }
+        }
         ManualResetEvent completeEvent = new ManualResetEvent(false);
+
+
+        CopyFileWorkItemProcessor processor;
+        WorkItemPool<CopyFileWorkItem> processorThreadPool;
 
         public MultiThreadCopyCommand()
         {
+            processor = new CopyFileWorkItemProcessor
+            {
+                ConfirmCopy = ConfirmCopy,
+                ConfirmCreateDirectory = ConfirmCreateDirectory,
+                NotifyCopy = NotifyCopy,
+                NotifyCreateDirectory = NotifyCreateDirectory
+            };
+
+            processorThreadPool = new WorkItemPool<CopyFileWorkItem>(processor);
+
+            processor.Start += new EventHandler<CancelWorkItemEventArgs<CopyFileWorkItem>>(processor_Start);
+            processor.Complete += new EventHandler<WorkItemResultEventArgs<CopyFileWorkItem>>(processor_Complete);
+            processor.ProgressUpdate += new EventHandler<ProgressEventArgs<CopyFileWorkItem>>(processor_ProgressUpdate);
         }
 
-        #region IAsyncCommand Members
-
-        public void Do()
+        private List<FileSystemInfo> GetOrderedSources()
         {
-            OnStart(new EventArgs());
+            List<FileSystemInfo> sources = new List<FileSystemInfo>();
+            for (int i = 0; i < Sources.Length; ++i)
+            {
+                FileSystemInfo source = null;
+                string src = Sources[i];
+                if (File.Exists(src))
+                {
+                    source = new FileInfo(src);
+                    sources.Add(source);
+                }
+                else if (Directory.Exists(src))
+                {
+                    source = new DirectoryInfo(src);
+                    sources.Add(source);
+                }
 
+                if (source == null)
+                {
+                    OnError(new GX.Patterns.ErrorEventArgs(new FileNotFoundException(string.Format("Source file {0} cannot be found.", src), src)));
+                }
+            }
+            return sources;
+        }
+
+        private List<FileSystemInfo> QueueWorkItemsForSources(List<FileSystemInfo> sources)
+        {
+            for (int i = 0; i < sources.Count; ++i)
+            {
+                FileSystemInfo source = sources[i];
+                double weight = 1.0 / sources.Count;
+                processorThreadPool.QueueUserWorkitem(new CopyFileWorkItem()
+                {
+                    Destination = Destinations[i < Destinations.Length ? i : (Destinations.Length - 1)],
+                    Item = source,
+                    ProgressWeight = weight,
+                    FinishedSize = 0
+                }).Complete += new EventHandler(MultiThreadCopyCommand_Complete);
+            }
+            return sources;
+        }
+
+        private List<FileSystemInfo> QueueWorkItemsForSources()
+        {
+            List<FileSystemInfo> sources = GetOrderedSources();
+            return QueueWorkItemsForSources(sources);
+        }
+
+        private void PrepareForRun()
+        {
             this.excludes.Clear();
             this.excludes.UnionWith(Excludes);
             if (!string.IsNullOrEmpty(IncludePattern))
@@ -52,54 +118,19 @@ namespace GX.Architecture.IO.Commands
             {
                 this.excludePattern = new Regex(ExcludePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
+        }
 
+        #region IAsyncCommand Members
 
+        public void Do()
+        {
+            OnStart(new EventArgs());
 
-            CopyFileWorkItemProcessor processor = new CopyFileWorkItemProcessor(RetryCount, ConfirmCopy, ConfirmCreateDirectory, NotifyCopy, NotifyCreateDirectory);
+            PrepareForRun();
 
-            processor.Start += new EventHandler<CancelWorkItemEventArgs<CopyFileWorkItem>>(processor_Start);
-            processor.Complete += new EventHandler<WorkItemResultEventArgs<CopyFileWorkItem>>(processor_Complete);
-            processor.ProgressUpdate += new EventHandler<ProgressEventArgs<CopyFileWorkItem>>(processor_ProgressUpdate);
-            int validSources = 0;
-            WorkItemPool<CopyFileWorkItem> processorThreadPool = new WorkItemPool<CopyFileWorkItem>(processor);
-            List<FileSystemInfo> sources = new List<FileSystemInfo>();
-            for (int i = 0; i < Sources.Length; ++i )
-            {
-                FileSystemInfo source = null;
-                string src = Sources[i];
-                if (File.Exists(src))
-                {
-                    source = new FileInfo(src);
-                    ++validSources;
-                }
-                else if (Directory.Exists(src))
-                {
-                    source = new DirectoryInfo(src);
-                    ++validSources;
-                }
-                sources.Add(source);
-                if(source == null)
-                {
-                    OnError(new GX.Patterns.ErrorEventArgs(new FileNotFoundException(string.Format("Source file {0} cannot be found.", src), src)));
-                }
-            }
+            var sources = QueueWorkItemsForSources();
 
-            for(int i = 0; i < sources.Count; ++i)
-            {
-                FileSystemInfo source = sources[i];
-                if (source != null)
-                {
-                    double weight = 1.0 / validSources;
-                    processorThreadPool.QueueUserWorkitem(new CopyFileWorkItem()
-                    {
-                        Destination = Destinations[i < Destinations.Length ? i : (Destinations.Length - 1)],
-                        Item = source,
-                        ProgressWeight = weight,
-                        FinishedSize = 0
-                    }).Complete += new EventHandler(MultiThreadCopyCommand_Complete);
-                }
-            }
-            if (validSources <= 0)
+            if (sources.Count <= 0)
             {
                 OnComplete(new EventArgs());
             }

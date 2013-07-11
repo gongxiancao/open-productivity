@@ -11,18 +11,13 @@ namespace GX.Architecture.IO.Commands
 {
     public class CopyFileWorkItemProcessor : IWorkItemProcessor<CopyFileWorkItem>, IProgressMonitorable<CopyFileWorkItem>
     {
-        private ConfirmCopyCallback confirmCopy;
-        private ConfirmCreateDirectoryCallback confirmCreateDirectory;
-        private NotifyCopyCallback notifyCopy;
-        private NotifyCreateDirectoryCallback notifyCreateDirectory;
-        private readonly int retryCount = 0;
-        public CopyFileWorkItemProcessor(int retryCount, ConfirmCopyCallback confirmCopy, ConfirmCreateDirectoryCallback confirmCreateDirectory, NotifyCopyCallback notifyCopy, NotifyCreateDirectoryCallback notifyCreateDirectory)
+        public ConfirmCopyCallback ConfirmCopy { get; set; }
+        public ConfirmCreateDirectoryCallback ConfirmCreateDirectory { get; set; }
+        public NotifyCopyCallback NotifyCopy { get; set; }
+        public NotifyCreateDirectoryCallback NotifyCreateDirectory { get; set; }
+        public int RetryCount { get; set; }
+        public CopyFileWorkItemProcessor()
         {
-            this.retryCount = retryCount;
-            this.confirmCopy = confirmCopy;
-            this.confirmCreateDirectory = confirmCreateDirectory;
-            this.notifyCopy = notifyCopy;
-            this.notifyCreateDirectory = notifyCreateDirectory;
         }
 
         public void ProcessWorkItem(CopyFileWorkItem workItem)
@@ -40,7 +35,7 @@ namespace GX.Architecture.IO.Commands
                     if (fsi is FileInfo)
                     {
                         int cancel = 0;
-                        GX.IO.Utilities.CopyFile(fsi as FileInfo, workItem.Destination, retryCount, ref cancel, workItem, CopyFileProgressUpdate, confirmCopy, notifyCopy);
+                        GX.IO.Utilities.CopyFile(fsi as FileInfo, workItem.Destination, RetryCount, ref cancel, workItem, CopyFileProgressUpdate, ConfirmCopy, NotifyCopy);
                     }
                     else if (fsi is DirectoryInfo)
                     {
@@ -49,7 +44,7 @@ namespace GX.Architecture.IO.Commands
                         bool destDirectoryExists = Directory.Exists(workItem.Destination);
                         if (!destDirectoryExists)
                         {
-                            destDirectoryExists = GX.IO.Utilities.CreateDirectory(workItem.Destination, confirmCreateDirectory, notifyCreateDirectory);
+                            destDirectoryExists = GX.IO.Utilities.CreateDirectory(workItem.Destination, ConfirmCreateDirectory, NotifyCreateDirectory);
                         }
                         if (destDirectoryExists)
                         {
