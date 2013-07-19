@@ -45,6 +45,7 @@
     <Compile Include="Parser\Token.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Search\Searcher.cs" />
+    <Compile Include="Tree\DepthFirstPreOrderTreeEnumerator.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -6,9 +6,8 @@ using System.IO;
 
 namespace GX.Architecture.IO.Commands
 {
-    public class CopyFileWorkItem
+     public class CopyFileWorkItem : FileWorkItem
     {
-        public FileSystemInfo Item { get; set; }
         public string Destination { get; set; }
         public double ProgressWeight { get; set; }
         public long FinishedSize { get; set; }

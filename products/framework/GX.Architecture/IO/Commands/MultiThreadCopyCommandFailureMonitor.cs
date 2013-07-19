@@ -12,7 +12,7 @@ namespace GX.Architecture.IO.Commands
 
         public MultiThreadCopyCommandFailureMonitor(MultiThreadCopyCommand target)
         {
-            target.CopyFileComplete += new EventHandler<Patterns.WorkItemEventArgs<CopyFileWorkItem>>(target_CopyFileComplete);
+            target.WorkItemComplete += new EventHandler<Patterns.WorkItemEventArgs<CopyFileWorkItem>>(target_CopyFileComplete);
             this.FailedWorkItems = new List<CopyFileWorkItem>();
         }
 

@@ -16,6 +16,7 @@ namespace GX.Architecture.IO.Commands
         public NotifyCopyCallback NotifyCopy { get; set; }
         public NotifyCreateDirectoryCallback NotifyCreateDirectory { get; set; }
         public int RetryCount { get; set; }
+
         public CopyFileWorkItemProcessor()
         {
         }

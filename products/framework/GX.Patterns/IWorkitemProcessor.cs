@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GX.Patterns.Progress;
 
 namespace GX.Patterns
 {
@@ -54,10 +55,12 @@ namespace GX.Patterns
 
     public interface IWorkItemProcessor<T>
     {
+        int RetryCount { get; set; }
         void ProcessWorkItem(T workItem);
         bool IsValidWorkItem(T workItem);
         event EventHandler<CancelWorkItemEventArgs<T>> Start;
         event EventHandler<NewWorkItemEventArgs<T>> NewWorkItem;
         event EventHandler<WorkItemResultEventArgs<T>> Complete;
+        event EventHandler<ProgressEventArgs<T>> ProgressUpdate;
     }
 }

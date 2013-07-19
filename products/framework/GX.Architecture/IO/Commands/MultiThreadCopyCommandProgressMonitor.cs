@@ -84,8 +84,8 @@ namespace GX.Architecture.IO.Commands
             target.Start += new EventHandler(target_Start);
             target.Complete += new EventHandler(target_Complete);
 
-            target.CopyFileStart += new EventHandler<Patterns.WorkItemEventArgs<CopyFileWorkItem>>(target_CopyFileStart);
-            target.CopyFileComplete += new EventHandler<Patterns.WorkItemEventArgs<CopyFileWorkItem>>(target_CopyFileComplete);
+            target.WorkItemStart += new EventHandler<Patterns.WorkItemEventArgs<CopyFileWorkItem>>(target_CopyFileStart);
+            target.WorkItemComplete += new EventHandler<Patterns.WorkItemEventArgs<CopyFileWorkItem>>(target_CopyFileComplete);
         }
 
         void target_CopyFileStart(object sender, Patterns.WorkItemEventArgs<CopyFileWorkItem> e)

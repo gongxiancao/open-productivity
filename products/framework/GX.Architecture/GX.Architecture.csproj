@@ -52,6 +52,8 @@
     <Compile Include="Configuration\CommandLine\SwitchAttribute.cs" />
     <Compile Include="Data\StringExt.cs" />
     <Compile Include="Data\XmlNodeExt.cs" />
+    <Compile Include="IO\Commands\FileWorkItem.cs" />
+    <Compile Include="IO\Commands\MultiThreadFileCommand.cs" />
     <Compile Include="IO\Commands\MultiThreadCopyCommandFailureMonitor.cs" />
     <Compile Include="IO\Commands\CopyFileWorkItem.cs" />
     <Compile Include="IO\Commands\CopyFileWorkItemProcessor.cs" />
